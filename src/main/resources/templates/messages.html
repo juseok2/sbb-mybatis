@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmln:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Messages</title>
+</head>
+<body>
+<!--비어있는 div -->
+<h1>Message List</h1>
+<div id="loading" class="loading">
+Loading...
+</div>
+<div id="error" class="error">fetch 과정에서 오류가 발생</div>
+<ul id="messageList"></ul>
+<!--fetch를 사용해 결과 출력 -->
+<script type="text/javascript">
+function fetchMessages(){
+	const messageList = document.getElementById('messageList');
+	const loading = document.getElementById('loading');
+	const error = document.getElementById('error');
+	
+	loading.style.display = "block";
+	error.style.display = "none";
+	messageList.innerHTML = '';
+	
+	fetch('/messages/api')
+	.then(response => {
+		//응답 결과를 JSON으로 변환
+		if(!response.ok){
+			throw new Error('Network response was not ok');
+		}
+		return response.json();
+	})
+	.then(messages => {
+		//변환된 결과를 li요소로 만들어 화면에 추가	
+		loading.style.display = "none";
+		messages.forEach(msg => {
+			const li = document.createElement('li');
+			li.textContent = `${msg.message} (${msg.id})`;
+			messageList.appendChild(li);
+		})
+	})
+	.catch(err => {
+		console.log('Fetch error: ', err);
+		loading.style.display = "none";
+		error.style.display = "block";
+	})
+}
+fetchMessages();
+</script>
+</body>
+</html>
